@@ -18,7 +18,7 @@ app.post("/generate-image", async (req, res) => {
   }
 
   try {
-    // 1. طلب توليد الصورة من OpenAI DALL-E 3
+    // 1. طلب توليد الصورة من OpenAI (تم حذف response_format للتدقيق)
     const response = await axios.post(
       "https://api.openai.com/v1/images/generations",
       {
@@ -26,9 +26,6 @@ app.post("/generate-image", async (req, res) => {
         prompt: prompt,
         n: 1,
         size: "1024x1024",
-  res.json({
-  image: imageUrl
-});
       },
       {
         headers: {
@@ -38,12 +35,18 @@ app.post("/generate-image", async (req, res) => {
       }
     );
 
-    // 3. إرسال الصورة إلى التطبيق بنفس الهيكلية لضمان عمل البلوكات الحالية
-const imageUrl = response.data.data[0].url;
+    // 2. الحصول على رابط الصورة المباشر من OpenAI
+    const imageUrl = response.data.data[0].url;
+
+    // 3. تحميل الصورة وتحويلها إلى Base64 لإرسالها للتطبيق
+    const imageBuffer = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    const imageBase64 = Buffer.from(imageBuffer.data, "binary").toString("base64");
+
+    // 4. إرجاع النتيجة للتطبيق
+    res.json({ image: imageBase64 });
   } catch (err) {
     const errorMsg = err.response?.data ? JSON.stringify(err.response.data) : err.message;
-  console.log(err.response?.status);
-console.log(err.response?.data);
+    console.log("OpenAI Error:", errorMsg);
     res.status(500).json({ error: "Generation failed" });
   }
 });
