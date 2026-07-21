@@ -26,7 +26,9 @@ app.post("/generate-image", async (req, res) => {
         prompt: prompt,
         n: 1,
         size: "1024x1024",
-        response_format: "b64_json", // الحصول على الصورة مباشرة كـ Base64
+  res.json({
+  image: imageUrl
+});
       },
       {
         headers: {
@@ -36,11 +38,8 @@ app.post("/generate-image", async (req, res) => {
       }
     );
 
-    // 2. استخراج الصورة بصيغة Base64
-    const imageBase64 = response.data.data[0].b64_json;
-
     // 3. إرسال الصورة إلى التطبيق بنفس الهيكلية لضمان عمل البلوكات الحالية
-    res.json({ image: imageBase64 });
+const imageUrl = response.data.data[0].url;
   } catch (err) {
     const errorMsg = err.response?.data ? JSON.stringify(err.response.data) : err.message;
   console.log(err.response?.status);
