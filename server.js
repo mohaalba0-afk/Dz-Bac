@@ -22,7 +22,7 @@ app.post("/generate-image", async (req, res) => {
     const response = await axios.post(
       "https://api.openai.com/v1/images/generations",
       {
-        model: "dall-e-2",
+       model: "gpt-image-1",
         prompt: prompt,
         n: 1,
         size: "1024x1024",
